@@ -4,6 +4,7 @@ import dotenv from "dotenv"
 dotenv.config();
 
 import userRoute from "./routes/user.routes"
+import adminRoute from "./routes/admin.routes"
 
 const app = express();
 
@@ -15,5 +16,6 @@ app.get("/health", (req: Request, res: Response) => {
 });
 
 app.use("/api/v1/user", userRoute)
+app.use("/api/v1/admin", adminRoute)
 
 export default app;
