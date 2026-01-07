@@ -13,6 +13,7 @@ export interface IUser extends Document {
     dateOfBirth?: Date;
     profilePic?: string;
     address?: IAddress;
+    isEmailVerified?: Boolean;
 
     isPasswordValid(candidatePassword: string): Promise<boolean>;
 
@@ -81,6 +82,10 @@ const UserSchema = new mongoose.Schema<IUser>(
         address: {
             type: AddressSchema,
         },
+        isEmailVerified: {
+            type: Boolean,
+            default: false
+        }
     },
     {
         timestamps: true,
