@@ -5,6 +5,7 @@ dotenv.config();
 
 import userRoute from "./routes/user.routes"
 import adminRoute from "./routes/admin.routes"
+import productRoutes from "./routes/product.routes"
 
 const app = express();
 
@@ -17,5 +18,6 @@ app.get("/health", (req: Request, res: Response) => {
 
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/admin", adminRoute)
+app.use("/api/products", productRoutes);
 
 export default app;
