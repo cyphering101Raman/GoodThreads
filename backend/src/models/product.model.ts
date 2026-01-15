@@ -91,7 +91,7 @@ const ProductSchema = new Schema<IProduct>(
 
         gender: {
             type: String,
-            enum: ["men", "women", "unisex"],
+            enum: ["Men", "Women", "Unisex"],
         },
 
         images: {
