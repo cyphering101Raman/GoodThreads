@@ -8,19 +8,34 @@ export interface AuthRequest extends Request {
     };
 }
 
-
 export const createProduct = async (req: AuthRequest, res: Response) => {
     try {
+        const files = req.files as {
+            images?: Express.Multer.File[];
+            thumbnail?: Express.Multer.File[];
+        };
+
+        if (!files.images?.length || !files.thumbnail?.length) {
+            return res.status(400).json({ message: "Images and thumbnail required" });
+        }
+
+        const imageUrls = files.images.map((file) => file.path);
+        const thumbnailUrls = files.thumbnail.map(file => file.path);
+
         const product = await Product.create({
             ...req.body,
-            adminId: req.user!.userId,
+            images: imageUrls,
+            thumbnail: thumbnailUrls,
+            adminId: req.user!.userId
         });
 
         res.status(201).json(product);
-    } catch (error) {
+    } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Product creation failed" });
     }
 };
+
 
 export const updateProduct = async (req: Request, res: Response) => {
     try {
@@ -36,7 +51,7 @@ export const updateProduct = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        res.json(product);
+        res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: "Product update failed" });
     }
@@ -53,7 +68,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        res.json({ message: "Product deleted successfully" });
+        res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
         res.status(500).json({ message: "Product deletion failed" });
     }
@@ -62,10 +77,26 @@ export const deleteProduct = async (req: Request, res: Response) => {
 
 export const getAllProducts = async (req: Request, res: Response) => {
     try {
-        const products = await Product.find({ })
+        const page = Math.max(Number(req.query.page) || 1, 1);
+        const pageLimit = 16;
+        const productSkip = (page - 1) * pageLimit;
+        const totalCount: number = await Product.countDocuments({});
+        const totalPages = Math.ceil(totalCount / pageLimit);
+
+        const products = await Product.find({})
+            .skip(productSkip)
+            .limit(pageLimit)
             .sort({ createdAt: -1 });
 
-        res.json(products);
+        res.status(200).json({
+            products,
+            pagination: {
+                totalCount,
+                totalPages,
+                currentPage: page,
+                pageLimit,
+            }
+        });
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch products" });
     }
@@ -82,7 +113,7 @@ export const getProductBySlug = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Product not found" });
         }
 
-        res.json(product);
+        res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: "Failed to fetch product" });
     }
@@ -102,7 +133,7 @@ export const toggleFeaturedProduct = async (req: Request, res: Response) => {
         product.isFeatured = !product.isFeatured;
         await product.save();
 
-        res.json({
+        res.status(200).json({
             message: "Product featured status updated",
             isFeatured: product.isFeatured,
         });
@@ -126,7 +157,7 @@ export const updateVariantStock = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Variant not found" });
         }
 
-        res.json(product);
+        res.status(200).json(product);
     } catch (error) {
         res.status(500).json({ message: "Failed to update stock" });
     }
