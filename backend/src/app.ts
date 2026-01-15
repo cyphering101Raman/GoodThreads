@@ -1,5 +1,6 @@
 import express, { Request, Response } from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import dotenv from "dotenv"
 dotenv.config();
 
@@ -11,6 +12,13 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+    cors({
+        origin: process.env.CLIENT_URL,
+        credentials: true,
+        allowedHeaders: ["Content-Type", "Authorization"],
+    })
+);
 
 app.get("/health", (req: Request, res: Response) => {
     res.json({ status: "ok" });
@@ -18,6 +26,6 @@ app.get("/health", (req: Request, res: Response) => {
 
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/admin", adminRoute)
-app.use("/api/products", productRoutes);
+app.use("/api/v1/products", productRoutes);
 
 export default app;
