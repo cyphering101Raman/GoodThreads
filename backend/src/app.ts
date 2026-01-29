@@ -7,6 +7,9 @@ dotenv.config();
 import userRoute from "./routes/user.routes"
 import adminRoute from "./routes/admin.routes"
 import productRoutes from "./routes/product.routes"
+import cartRoutes from "./routes/cart.routes";
+import wishlistRoutes from "./routes/wishlist.routes";
+import orderRoutes from "./routes/order.routes"
 
 const app = express();
 
@@ -27,5 +30,9 @@ app.get("/health", (req: Request, res: Response) => {
 app.use("/api/v1/user", userRoute)
 app.use("/api/v1/admin", adminRoute)
 app.use("/api/v1/products", productRoutes);
+app.use("/api/v1/cart", cartRoutes);
+app.use("/api/v1/wishlist", wishlistRoutes);
+app.use("/api/v1/orders", orderRoutes);
+
 
 export default app;
